@@ -25,9 +25,4 @@ A high-performance, real-time streaming AI study assistant built with FastAPI, T
 ### 1. Configure Environment Variable
 Set your API key in your terminal:
 
-```bash
-# Windows (PowerShell)
-$env:GEMINI_API_KEY="your_api_key_here"
 
-# Linux / macOS
-export GEMINI_API_KEY="your_api_key_here"
