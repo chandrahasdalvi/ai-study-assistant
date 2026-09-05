@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>AI Study Assistant</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://unpkg.com/lucide@latest"></script>
+</head>
+<body class="bg-slate-900 text-slate-100 h-screen flex flex-col font-sans">
+
+  <header class="border-b border-slate-800 bg-slate-950/50 backdrop-blur px-6 py-4 flex items-center justify-between">
+    <div class="flex items-center gap-3">
+      <div class="w-3 h-3 rounded-full bg-emerald-500 animate-pulse"></div>
+      <h1 class="text-lg font-semibold tracking-wide text-slate-200">AI Study Assistant</h1>
+    </div>
+    <div class="flex items-center gap-3">
+      <button 
+        onclick="resetChat()" 
+        class="flex items-center gap-1.5 text-xs bg-slate-800 hover:bg-slate-700 text-slate-300 px-3 py-1.5 rounded-lg border border-slate-700 transition"
+      >
+        <i data-lucide="rotate-ccw" class="w-3.5 h-3.5"></i>
+        Reset Chat
+      </button>
+      <span class="text-xs bg-slate-800 text-slate-400 px-2.5 py-1 rounded-full border border-slate-700">Gemini 3.6 Flash</span>
+    </div>
+  </header>
+
+  <main class="flex-1 overflow-y-auto p-4 md:p-6 space-y-4 max-w-3xl w-full mx-auto" id="chatBox">
+    <div id="welcomeMessage" class="text-center py-12 space-y-3">
+      <div class="w-12 h-12 rounded-2xl bg-indigo-600/20 text-indigo-400 flex items-center justify-center mx-auto border border-indigo-500/30">
+        <i data-lucide="bot" class="w-6 h-6"></i>
+      </div>
+      <h2 class="text-xl font-medium text-slate-200">How can I help you study today?</h2>
+      <p class="text-sm text-slate-400 max-w-sm mx-auto">Ask questions, summarize topics, or test your memory in real-time.</p>
+    </div>
+  </main>
+
+  <footer class="p-4 border-t border-slate-800 bg-slate-950/40">
+    <div class="max-w-3xl mx-auto relative flex items-center">
+      <input 
+        type="text" 
+        id="userInput" 
+        placeholder="Send a message..." 
+        onkeydown="if(event.key==='Enter') sendMessage()"
+        class="w-full bg-slate-800/80 text-slate-100 placeholder-slate-400 rounded-xl px-4 py-3.5 pr-12 border border-slate-700/60 focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 transition text-sm"
+      />
+      <button 
+        onclick="sendMessage()" 
+        class="absolute right-2.5 p-2 rounded-lg bg-indigo-600 hover:bg-indigo-500 text-white transition"
+      >
+        <i data-lucide="send" class="w-4 h-4"></i>
+      </button>
+    </div>
+  </footer>
+
+  <script>
+    lucide.createIcons();
+
+    async function sendMessage() {
+      const input = document.getElementById("userInput");
+      const text = input.value.trim();
+      if (!text) return;
+
+      const welcomeMsg = document.getElementById("welcomeMessage");
+      if (welcomeMsg) welcomeMsg.remove();
+
+      appendMessage(text, "user");
+      input.value = "";
+
+      const botMsgDiv = appendMessage("...", "bot");
+
+      try {
+        const res = await fetch("/api/chat", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ message: text })
+        });
+
+        const reader = res.body.getReader();
+        const decoder = new TextDecoder();
+        let isFirstChunk = true;
+
+        while (true) {
+          const { done, value } = await reader.read();
+          if (done) break;
+          
+          if (isFirstChunk) {
+            botMsgDiv.innerText = "";
+            isFirstChunk = false;
+          }
+
+          botMsgDiv.innerText += decoder.decode(value, { stream: true });
+          document.getElementById("chatBox").scrollTop = document.getElementById("chatBox").scrollHeight;
+        }
+      } catch (err) {
+        botMsgDiv.innerText = "Error contacting server.";
+      }
+    }
+
+    function appendMessage(text, sender) {
+      const chatBox = document.getElementById("chatBox");
+      const wrapper = document.createElement("div");
+      wrapper.className = `flex ${sender === 'user' ? 'justify-end' : 'justify-start'}`;
+
+      const msgDiv = document.createElement("div");
+      msgDiv.className = sender === "user" 
+        ? "max-w-[80%] bg-indigo-600 text-white rounded-2xl rounded-tr-sm px-4 py-3 text-sm leading-relaxed shadow-sm"
+        : "max-w-[80%] bg-slate-800 text-slate-200 border border-slate-700/50 rounded-2xl rounded-tl-sm px-4 py-3 text-sm leading-relaxed shadow-sm whitespace-pre-wrap";
+
+      msgDiv.innerText = text;
+      wrapper.appendChild(msgDiv);
+      chatBox.appendChild(wrapper);
+      chatBox.scrollTop = chatBox.scrollHeight;
+      return msgDiv;
+    }
+
+    async function resetChat() {
+      await fetch("/api/reset", { method: "POST" });
+      location.reload();
+    }
+  </script>
+</body>
+</html>

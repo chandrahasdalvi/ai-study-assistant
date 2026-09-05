@@ -1,0 +1,45 @@
+COURSE: Operating Systems (Semester 4)
+
+MODULE 1: CPU SCHEDULING
+- FCFS (First-Come, First-Served): Non-preemptive. High average waiting time (Convoy effect).
+- SJF (Shortest Job First): Optimal average waiting time. Can cause starvation for long processes.
+- Round Robin (RR): Preemptive using time quantum (e.g., 2ms-5ms). High context-switching overhead if quantum is too small.
+
+MODULE 2: DEADLOCKS
+- Four Necessary Conditions: Mutual Exclusion, Hold and Wait, No Preemption, Circular Wait.
+- Banker's Algorithm: Used for deadlock avoidance by verifying if the system remains in a safe state.
+
+EXAM RULES:
+- OS Oral Exam focuses on Process Lifecycle, Page Replacement (LRU/FIFO), and System Calls.
+
+SUBJECT: Artificial Intelligence & Machine Learning
+
+KEY FORMULAS & CONCEPTS:
+- Mean Squared Error (MSE): Loss = (1/n) * sum((y_actual - y_predicted)^2)
+- Precision: TP / (TP + FP)
+- Recall: TP / (TP + FN)
+- F1-Score: 2 * (Precision * Recall) / (Precision + Recall)
+
+MODEL CHEATSHEET:
+- Overfitting: High training accuracy, low test accuracy. Fix: Regularization (L1/L2), Dropout, or adding more training data.
+- Underfitting: Low training and low test accuracy. Fix: Increase model complexity or add features.
+
+PROJECT: AI Study Assistant App
+TECH STACK: Python 3.12, FastAPI, Uvicorn, Tailwind CSS, Google GenAI SDK.
+MODEL: gemini-3.6-flash via client.aio.chats
+
+BACKEND LOGIC:
+- main.py serves index.html at GET /
+- POST /api/chat handles streaming responses via send_message_stream
+- POST /api/reset clears state and creates a fresh chat session
+
+PROJECT: AI Study Assistant App
+TECH STACK: Python 3.12, FastAPI, Uvicorn, Tailwind CSS, Google GenAI SDK.
+MODEL: gemini-3.6-flash via client.aio.chats
+
+BACKEND LOGIC:
+- main.py serves index.html at GET /
+- POST /api/chat handles streaming responses via send_message_stream
+- POST /api/reset clears state and creates a fresh chat sess
+
+DBMS IS data base managenment system
